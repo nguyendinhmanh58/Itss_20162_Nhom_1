@@ -94,7 +94,6 @@ void updateFloorText(int numberFloor) {
     if(numberFloor == floor) {
         addArrival();
     }
-    gtk_widget_queue_draw(labelNumberFloor);
 }
 
 
@@ -133,15 +132,19 @@ void callRequest(GtkWidget* button, gpointer* data) {
     {
         case 2:
             kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ELEVATOR_CALL_122));
+            printf("--> ADD REQUEST: 1 floor request to 2 floor\n");
             break;
         case 3:
             kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ELEVATOR_CALL_123));
+            printf("--> ADD REQUEST: 1 floor request to 3 floor\n");  
             break;
         case 4:
             kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ELEVATOR_CALL_124));
+            printf("--> ADD REQUEST: 1 floor request to 4 floor\n");
             break;
         case 5:
             kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ELEVATOR_CALL_125));
+            printf("--> ADD REQUEST: 1 floor request to 5 floor\n"); 
             break;
     }
 }

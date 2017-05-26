@@ -19,6 +19,11 @@ void main(int argc, char const *argv[])
 		execl("./liftMng","./liftMng",NULL);
 	}
 	if((pid=fork())==0) {
+		execl("./liftSensor","./liftSensor",NULL);
+		return;
+	}
+	
+	if((pid=fork())==0) {
 		execl("./liftCtr","./liftCtr",NULL);
 		return;
 	}
@@ -26,6 +31,7 @@ void main(int argc, char const *argv[])
 		execl("./liftBody","./liftBody",NULL);
 		return;
 	}
+	
 	if((pid=fork())==0){
 		execl("./1nd_floor","./1nd_floor",NULL);
 	}
@@ -47,9 +53,6 @@ void main(int argc, char const *argv[])
 		execl("./x_floor","./x_floor","5",NULL);
 		return;
 	}
-	if((pid=fork())==0) {
-		execl("./liftSensor","./liftSensor",NULL);
-		return;
-	}
+	
 	return;
 }

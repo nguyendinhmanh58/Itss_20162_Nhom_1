@@ -122,7 +122,6 @@ void updateFloorText(int numberFloor) {
     if(numberFloor == floor) {
         addArrival();
     } 
-    gtk_widget_queue_draw(labelNumberFloor);
 }
 
 
@@ -151,15 +150,19 @@ void callRequest() {
     switch(floor) {
         case 2:
             kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ELEVATOR_CALL_221));
+            printf("--> ADD REQUEST: 2 floor request to 1 floor\n");       
             break;
         case 3:
             kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ELEVATOR_CALL_321));
+            printf("--> ADD REQUEST: 3 floor request to 1 floor\n");
             break;
         case 4:
             kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ELEVATOR_CALL_421));
+            printf("--> ADD REQUEST: 4 floor request to 1 floor\n");
             break;
         case 5:
             kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ELEVATOR_CALL_521));
+            printf("--> ADD REQUEST: 5 floor request to 1 floor\n");
             break;
     }
 }

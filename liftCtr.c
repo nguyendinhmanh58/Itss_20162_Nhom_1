@@ -10,8 +10,7 @@ int main ()
 {
     shm_pid_id = initShmPid(&pid_list);
     pid_list[LIFT_CTR] = getpid();
-    
-    
+ 
     signal(enSigNo(SIGNAL_ELEVATOR_CALL_122), handle);
     signal(enSigNo(SIGNAL_ELEVATOR_CALL_123), handle);
     signal(enSigNo(SIGNAL_ELEVATOR_CALL_124), handle);
@@ -40,7 +39,8 @@ int main ()
 }
 
 void handle(int sigNo)
-{
+{   
+    int arrivalNumberFloor;
     switch(deSigNo(sigNo))
     {
     case SIGNAL_ELEVATOR_CALL_122:
@@ -104,85 +104,24 @@ void handle(int sigNo)
         }
         break;
     case SIGNAL_SENSOR_2ND_ON:
-        kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ARRIVAL_2ND));
-        if(destinationFloor == 2)
-        {
-            kill(pid_list[LIFT_BODY], enSigNo(SIGNAL_LIFT_STOP));
-            destinationFloor = 1;
-            if(requestFromFloor == 1)
-            {
-                printf("--> put out luggage ...\n");
-                sleep(3);
-                kill(pid_list[LIFT_BODY], enSigNo(SIGNAL_LIFT_DOWN));
-            }
-            else if(requestFromFloor == 2)
-            {
-                printf("--> put luggage ...\n");
-                sleep(3);
-                kill(pid_list[LIFT_BODY], enSigNo(SIGNAL_LIFT_DOWN));
-            }
-        }
-        break;
     case SIGNAL_SENSOR_3ND_ON:
-        kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ARRIVAL_3ND));
-        if(destinationFloor == 3)
-        {
-            kill(pid_list[LIFT_BODY], enSigNo(SIGNAL_LIFT_STOP));
-            destinationFloor = 1;
-            if(requestFromFloor == 1)
-            {
-                printf("--> put out luggage ...\n");
-                sleep(3);
-                kill(pid_list[LIFT_BODY], enSigNo(SIGNAL_LIFT_DOWN));
-            }
-            else if(requestFromFloor == 3)
-            {
-                printf("--> put luggage ...\n");
-                sleep(3);
-                kill(pid_list[LIFT_BODY], enSigNo(SIGNAL_LIFT_DOWN));
-            }
-        }
-
-        break;
     case SIGNAL_SENSOR_4ND_ON:
-        kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ARRIVAL_4ND));
-        if(destinationFloor == 4)
-        {
-            kill(pid_list[LIFT_BODY], enSigNo(SIGNAL_LIFT_STOP));
-            destinationFloor = 1;
-            if(requestFromFloor == 1)
-            {
-                printf("--> put out luggage ...\n");
-                sleep(3);
-                kill(pid_list[LIFT_BODY], enSigNo(SIGNAL_LIFT_DOWN));
-            }
-            else if(requestFromFloor == 4)
-            {
-                printf("--> put luggage ...\n");
-                sleep(3);
-                kill(pid_list[LIFT_BODY], enSigNo(SIGNAL_LIFT_DOWN));
-            }
-        }
-
-        break;
     case SIGNAL_SENSOR_5ND_ON:
-        kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ARRIVAL_5ND));
-        if(destinationFloor == 5)
+        arrivalNumberFloor = deSigNo(sigNo);
+        sendArrivalSignalToLiftMng(arrivalNumberFloor);
+        if(destinationFloor == arrivalNumberFloor)
         {
             kill(pid_list[LIFT_BODY], enSigNo(SIGNAL_LIFT_STOP));
             destinationFloor = 1;
-            if(requestFromFloor == 1)
-            {
+            if(requestFromFloor == 1) {
                 printf("-->put out luggage ...\n");
-                sleep(3);
-                kill(pid_list[LIFT_BODY], enSigNo(SIGNAL_LIFT_DOWN));
-            }
-            else if(requestFromFloor == 5)
-            {
+            } else if(requestFromFloor == arrivalNumberFloor) {
                 printf("-->put luggage ...\n");
-                sleep(3);
-                kill(pid_list[LIFT_BODY], enSigNo(SIGNAL_LIFT_DOWN));
             }
+
+            sleep(3);
+            kill(pid_list[LIFT_BODY], enSigNo(SIGNAL_LIFT_DOWN));
+            
         }
         break;
     case SIGNAL_SENSOR_1ND_OFF:
@@ -200,5 +139,25 @@ void handle(int sigNo)
     case SIGNAL_SENSOR_5ND_OFF:
         kill(pid_list[FLOOR_5ND], enSigNo(SIGNAL_MOVEOUT));
         break;
+    }
+}
+
+void sendArrivalSignalToLiftMng(int arrivalNumberFloor){
+    switch(arrivalNumberFloor) {
+        case 1:
+            kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ARRIVAL_1ND));
+            break;
+        case 2:
+            kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ARRIVAL_2ND));
+            break;
+        case 3:
+            kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ARRIVAL_3ND));
+            break;
+        case 4:
+            kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ARRIVAL_4ND));
+            break;
+        case 5:
+            kill(pid_list[LIFT_MNG], enSigNo(SIGNAL_ARRIVAL_5ND));
+            break;
     }
 }

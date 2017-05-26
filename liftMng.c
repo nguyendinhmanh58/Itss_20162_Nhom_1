@@ -52,39 +52,15 @@ int main () {
 void handle(int sigNo) {
 	switch(deSigNo(sigNo)) {
 		case SIGNAL_ELEVATOR_CALL_122:
-			printf("--> ADD REQUEST: 1 floor request to 2 floor\n");
-			writePipe(sigNo);
-			break;
 		case SIGNAL_ELEVATOR_CALL_123:
-			printf("--> ADD REQUEST: 1 floor request to 3 floor\n");
-			writePipe(sigNo);
-			break;
 		case SIGNAL_ELEVATOR_CALL_124:
-			printf("--> ADD REQUEST: 1 floor request to 4 floor\n");
-			writePipe(sigNo);
-			break;
 		case SIGNAL_ELEVATOR_CALL_125:
-			printf("--> ADD REQUEST: 1 floor request to 5 floor\n");
-			writePipe(sigNo);
-			break;
-        case SIGNAL_ELEVATOR_CALL_221:
-			printf("--> ADD REQUEST: 2 floor request to 1 floor\n");
-			writePipe(sigNo);
-			break;
-        case SIGNAL_ELEVATOR_CALL_321:
-			printf("--> ADD REQUEST: 3 floor request to 1 floor\n");
-			writePipe(sigNo);
-			break;
+		case SIGNAL_ELEVATOR_CALL_221:
+		case SIGNAL_ELEVATOR_CALL_321:
 		case SIGNAL_ELEVATOR_CALL_421:
-			printf("--> ADD REQUEST: 4 floor request to 1 floor\n");
+		case SIGNAL_ELEVATOR_CALL_521:
 			writePipe(sigNo);
 			break;
-        case SIGNAL_ELEVATOR_CALL_521:
-			printf("--> ADD REQUEST: 5 floor request to 1 floor\n");
-			writePipe(sigNo);
-			break;
-
-
         case SIGNAL_ARRIVAL_1ND:
             sendNotifiLiftArrival(enSigNo(SIGNAL_ARRIVAL_1ND));
             break;
