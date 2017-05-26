@@ -8,5 +8,5 @@
 	Buoc 1: mo ternimal
 	Buoc 2: Cai dat GTK+ 3(ubuntu) 
 			sudo apt-get install libgtk-3-d
-	Buoc 3: chay makefile
-	Buoc 4: chay ./start
+	Buoc 3: chay makefile: make
+	Buoc 4: chay: sudo ./start
