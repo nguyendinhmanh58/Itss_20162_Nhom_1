@@ -1,0 +1,18 @@
+.btn-floor {
+	background: yellow;
+}
+.btn-floor:hover {
+    background: red;
+}
+.bg-black {
+    background: black;
+}
+.text-white{
+    color: white;
+}
+.border-black-1{
+    border: 1px solid white;
+}
+.bg-red{
+    background: red;
+}
