@@ -6,7 +6,7 @@ int sensor_1nd = ON, sensor_2nd = OFF, sensor_3nd = OFF, sensor_4nd = OFF, senso
 int main() {
     shm_pid_id = initShmPid(&pid_list);
     shmLiftHeightId = initShmLiftHeight(&shmLiftHeight);
-    while(pid_list[LIFT_CTR] != 0) {
+    while(pid_list[LIFT_CTR]) {
        if(shmLiftHeight[0] >= 1.5 && shmLiftHeight[0] <= 2.5 && sensor_1nd == OFF) {
             sensor_1nd = ON;
             kill(pid_list[LIFT_CTR], enSigNo(SIGNAL_SENSOR_1ND_ON));

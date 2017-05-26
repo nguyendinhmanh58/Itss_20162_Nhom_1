@@ -32,7 +32,6 @@ int main() {
 int handle(int sigNo) {
     switch(deSigNo(sigNo)) {
         case  SIGNAL_LIFT_UP:
-            //isStop = false;
             if(status != UP) {
                 status = UP;
                 sendMoveStatusToFloors(status);
@@ -40,7 +39,6 @@ int handle(int sigNo) {
             moveLiftUp();
             break;
         case  SIGNAL_LIFT_DOWN:
-            //isStop = false;
             if(status != DOWN) {
                 status = DOWN;
                 sendMoveStatusToFloors(status);
@@ -48,7 +46,6 @@ int handle(int sigNo) {
             moveLiftDown();
             break;
         case  SIGNAL_LIFT_STOP:
-            //isStop = true;
             if(status != STOP) {
                 status = STOP;
                 sendMoveStatusToFloors(STOP);

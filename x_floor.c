@@ -5,13 +5,12 @@ GtkWidget *tableParent;
 GtkWidget *button;
 GtkWidget *buttonCall;
 GtkWidget *hAlign;
-GtkWidget *textView;
+GtkWidget *labelNumberFloor;
 GtkWidget *hbox;
 GtkWidget *arrow;
 GtkStyleContext *context;
 int floor;
 char floorTitle[15];
-int floorRequest = -1;
 int *pid_list;
 int shmid;
 void handle(int sigNo);
@@ -35,9 +34,7 @@ int main(int *argc, char* argv[])
     }
     
     floor = atoi(argv[1]);
-    setFloorTitle();
-    gtk_init(&argc, &argv);
-    initGtk();
+    setFloorInfo();
     
 
     signal(enSigNo(SIGNAL_ARRIVAL_1ND), handle);
@@ -46,16 +43,53 @@ int main(int *argc, char* argv[])
     signal(enSigNo(SIGNAL_ARRIVAL_4ND), handle);
     signal(enSigNo(SIGNAL_ARRIVAL_5ND), handle);
 
+    signal(enSigNo(SIGNAL_MOVEOUT), handle);
+
     // signal to update arrow
     signal(enSigNo(SIGNAL_START_MOVE_UP), handle);
     signal(enSigNo(SIGNAL_START_MOVE_DOWN), handle);
     signal(enSigNo(SIGNAL_STOP), handle);
 
      // <-------------  For add stylesheet.css
+    gtk_init(&argc, &argv);
+    initGtk();
     gtk_widget_show_all(window);
-
     gtk_main();
     gtk_widget_queue_draw(window);
+}
+
+void handle(int sigNo)
+{
+    switch(deSigNo(sigNo)) {
+        case SIGNAL_ARRIVAL_1ND:
+            updateFloorText(1);
+            break;
+        case SIGNAL_ARRIVAL_2ND:
+            updateFloorText(2);
+            break;
+        case SIGNAL_ARRIVAL_3ND:
+            updateFloorText(3);
+            break;
+        case SIGNAL_ARRIVAL_4ND:
+            updateFloorText(4);
+            break;
+        case SIGNAL_ARRIVAL_5ND:
+            updateFloorText(5);
+            break;
+        case SIGNAL_MOVEOUT:
+            removeArrival();
+            break;
+
+        case SIGNAL_START_MOVE_UP:
+            updateStatusUpDownStop(1);
+            break;
+        case SIGNAL_STOP:
+            updateStatusUpDownStop(0);
+            break;
+        case SIGNAL_START_MOVE_DOWN:
+            updateStatusUpDownStop(2);
+            break;
+    }
 }
 
 void updateStatusUpDownStop(int status) {
@@ -72,45 +106,43 @@ void updateStatusUpDownStop(int status) {
 }
 
 void addArrival() {
-    context = gtk_widget_get_style_context(textView);
+    context = gtk_widget_get_style_context(labelNumberFloor);
     gtk_style_context_add_class(context,"bg-red");
-    //gtk_widget_queue_draw(textView);
 }
 
 void removeArrival() {
-    context = gtk_widget_get_style_context(textView);
+    context = gtk_widget_get_style_context(labelNumberFloor);
     gtk_style_context_remove_class(context,"bg-red");
 }
 
 void updateFloorText(int numberFloor) {
-    char numberFloorString[2];
+    char numberFloorString[4];
     sprintf(numberFloorString, "%d", numberFloor);
-    gtk_label_set_text(textView, numberFloorString);
+    gtk_label_set_text(labelNumberFloor, numberFloorString);
     if(numberFloor == floor) {
         addArrival();
-    } else {
-        removeArrival();
-    }
+    } 
+    gtk_widget_queue_draw(labelNumberFloor);
 }
 
 
-void setFloorTitle() {
+void setFloorInfo() {
     switch(floor) {
         case 2:
             strcpy(floorTitle, "Tang 2");
-            pid_list[FLOOR_2ND] = getpid(); // write pid of 1nd floor to share memory
+            pid_list[FLOOR_2ND] = getpid(); 
             break;
         case 3:
             strcpy(floorTitle, "Tang 3");
-            pid_list[FLOOR_3ND] = getpid(); // write pid of 1nd floor to share memory
+            pid_list[FLOOR_3ND] = getpid();
             break;
         case 4:
             strcpy(floorTitle, "Tang 4");
-            pid_list[FLOOR_4ND] = getpid(); // write pid of 1nd floor to share memory
+            pid_list[FLOOR_4ND] = getpid(); 
             break;
         case 5:
             strcpy(floorTitle, "Tang 5");
-            pid_list[FLOOR_5ND] = getpid(); // write pid of 1nd floor to share memory
+            pid_list[FLOOR_5ND] = getpid(); 
             break;
     }
 }
@@ -160,30 +192,29 @@ void initGtk() {
     gtk_window_set_title(GTK_WINDOW(window), floorTitle);
     gtk_container_set_border_width(GTK_CONTAINER(window), 5);
 
+    tableParent = gtk_table_new(2,1,FALSE);
+
     gtk_table_set_row_spacings(GTK_TABLE(tableParent), 5);
     gtk_table_set_col_spacings(GTK_TABLE(tableParent), 5);
 
-    tableParent = gtk_table_new(2,1,FALSE);
-
-    textView = gtk_label_new("1");
-    gtk_widget_set_size_request(textView, 50, 30);
-    context = gtk_widget_get_style_context(textView);
+    labelNumberFloor = gtk_label_new("1");
+    gtk_widget_set_size_request(labelNumberFloor, 50, 30);
+    context = gtk_widget_get_style_context(labelNumberFloor);
     gtk_style_context_add_class(context,"bg-black");
     gtk_style_context_add_class(context,"border-black-1");
     gtk_style_context_add_class(context,"text-white");
 
-    //arrow = gtk_image_new_from_file("up1.gif");
     arrow = gtk_image_new();
     gtk_widget_set_size_request(arrow, 30, 30);
 
     hbox = gtk_hbox_new(TRUE, 3);
     gtk_container_add(GTK_CONTAINER(hbox), arrow);
-    gtk_container_add(GTK_CONTAINER(hbox), textView);
+    gtk_container_add(GTK_CONTAINER(hbox), labelNumberFloor);
 
     buttonCall = gtk_button_new_with_label("Call");
     gtk_widget_set_size_request(buttonCall, 50, 30);
-
-    //gtk_table_attach(GTK_TABLE(tableParent), textView, 0,1,0,1,GTK_FILL, GTK_FILL, 100, 10);
+    context = gtk_widget_get_style_context(buttonCall);
+    gtk_style_context_add_class(context,"btn-call");
 
     gtk_table_attach(GTK_TABLE(tableParent), hbox, 0,1,0,1,GTK_FILL, GTK_FILL, 100, 5);
     gtk_table_attach(GTK_TABLE(tableParent), buttonCall, 0,1,1,2, GTK_FILL, GTK_FILL, 100, 5);
@@ -197,32 +228,3 @@ void initGtk() {
     
 }
 
-void handle(int sigNo)
-{
-    switch(deSigNo(sigNo)) {
-        case SIGNAL_ARRIVAL_1ND:
-            updateFloorText(1);
-            break;
-        case SIGNAL_ARRIVAL_2ND:
-            updateFloorText(2);
-            break;
-        case SIGNAL_ARRIVAL_3ND:
-            updateFloorText(3);
-            break;
-        case SIGNAL_ARRIVAL_4ND:
-            updateFloorText(4);
-            break;
-        case SIGNAL_ARRIVAL_5ND:
-            updateFloorText(5);
-            break;
-        case SIGNAL_START_MOVE_UP:
-            updateStatusUpDownStop(1);
-            break;
-        case SIGNAL_STOP:
-            updateStatusUpDownStop(0);
-            break;
-        case SIGNAL_START_MOVE_DOWN:
-            updateStatusUpDownStop(2);
-            break;
-    }
-}

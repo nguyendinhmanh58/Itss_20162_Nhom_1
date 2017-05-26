@@ -23,22 +23,6 @@ int initShmPid(int** ptr_pid) {
     return shmid;
 }
 
-int initShmLiftStatus(int** ptr_lift_status) {
-    // attach share memory lift operation status
-    int shm_lift_operation_status_id;
-	if ((shm_lift_operation_status_id = shmget(KEY_SHM_LIFT_OPERATION_STATUS,SHM_LIFT_OPERATION_SIZE*sizeof(int),IPC_CREAT|0660)) == -1){
-	    perror("shmget");
-	    exit(1);
-  	}
-  	*ptr_lift_status = (int*)shmat(shm_lift_operation_status_id,0,0);
-  	if ((*ptr_lift_status == (int*)-1))
-	{
-	   perror("shmat");
-	   exit(1);
-	}
-	return shm_lift_operation_status_id;
-}
-
 int initShmLiftHeight(float** shmLiftHeight) {
     int shmLiftHeightId;
     if ((shmLiftHeightId = shmget(KEY_SHM_LIFT_HEIGHT,SHM_LIFT_HEIGHT_SIZE*sizeof(float),IPC_CREAT|0660)) == -1){

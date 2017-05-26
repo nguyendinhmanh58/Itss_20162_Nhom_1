@@ -1,8 +1,11 @@
 .btn-floor {
 	background: yellow;
 }
-.btn-floor:hover {
-    background: red;
+.btn-floor:hover, .btn-call:hover {
+    background: #00ccFF;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
 }
 .bg-black {
     background: black;

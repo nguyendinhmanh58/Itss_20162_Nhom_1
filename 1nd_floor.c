@@ -6,12 +6,11 @@ GtkWidget *table;
 GtkWidget *button;
 GtkWidget *buttonCall;
 GtkWidget *hAlign;
-GtkWidget *textView;
+GtkWidget *labelNumberFloor;
 GtkWidget *hbox;
 GtkWidget *arrow;
 GtkStyleContext *context;
 int floor = 1;
-int floorRequest = -1;
 int *pid_list;
 int shmid;
 
@@ -39,6 +38,8 @@ int main(int *argc, char* argv[])
     signal(enSigNo(SIGNAL_ARRIVAL_3ND), handle);
     signal(enSigNo(SIGNAL_ARRIVAL_4ND), handle);
     signal(enSigNo(SIGNAL_ARRIVAL_5ND), handle);
+
+    signal(enSigNo(SIGNAL_MOVEOUT), handle);
 
     // signal to update arrow
     signal(enSigNo(SIGNAL_START_MOVE_UP), handle);
@@ -70,6 +71,10 @@ void handle(int sigNo)
         case SIGNAL_ARRIVAL_5ND:
             updateFloorText(5);
             break;
+        case SIGNAL_MOVEOUT:
+            removeArrival();
+            break;
+
         case SIGNAL_START_MOVE_UP:
             updateStatusUpDownStop(1);
             break;
@@ -85,12 +90,11 @@ void handle(int sigNo)
 void updateFloorText(int numberFloor) {
     char numberFloorString[4];
     sprintf(numberFloorString, "%d", numberFloor);
-    gtk_label_set_text(textView, numberFloorString);
+    gtk_label_set_text(labelNumberFloor, numberFloorString);
     if(numberFloor == floor) {
         addArrival();
-    } else {
-        removeArrival();
     }
+    gtk_widget_queue_draw(labelNumberFloor);
 }
 
 
@@ -103,35 +107,28 @@ void updateStatusUpDownStop(int status) {
         gtk_image_set_from_file(arrow, "up1.gif");
     } else {
         gtk_image_set_from_file(arrow, "down1.gif");
-    }
+    } 
     gtk_widget_queue_draw(arrow);
 }
 
 
 void addArrival() {
-    context = gtk_widget_get_style_context(textView);
+    context = gtk_widget_get_style_context(labelNumberFloor);
     gtk_style_context_add_class(context,"bg-red");
-    //gtk_widget_queue_draw(textView);
 }
 
 void removeArrival() {
-    context = gtk_widget_get_style_context(textView);
+    context = gtk_widget_get_style_context(labelNumberFloor);
     gtk_style_context_remove_class(context,"bg-red");
 }
 
-// void updateFloorRequest(int numberFloorRequest) {
-//     updateFloorText(numberFloorRequest);
-// }
-
-void updateFloorRequest(GtkWidget* button, gpointer* data) {
+void callRequest(GtkWidget* button, gpointer* data) {
     int *numberFloor = data;
+    int floorRequest = -1;
     if(numberFloor == 0) floorRequest = 2;
     if(numberFloor == 1) floorRequest = 3;
     if(numberFloor == 2) floorRequest = 4;
     if(numberFloor == 3) floorRequest = 5;
-}
-
-void callRequest() {
     switch(floorRequest)
     {
         case 2:
@@ -166,10 +163,12 @@ void initGtk() {
     gtk_container_set_border_width(GTK_CONTAINER(window), 5);
 
     gchar *values[4] = {"2", "3", "4","5"};
+
+    tableParent = gtk_table_new(2,1,FALSE);
+
     gtk_table_set_row_spacings(GTK_TABLE(tableParent), 5);
     gtk_table_set_col_spacings(GTK_TABLE(tableParent), 5);
 
-    tableParent = gtk_table_new(3,1,FALSE);
 
     table = gtk_table_new(2, 2, TRUE);
     gtk_table_set_row_spacings(GTK_TABLE(table), 2);
@@ -185,45 +184,34 @@ void initGtk() {
         {
             button = gtk_button_new_with_label(values[pos]);
             // add event listen when click button floor
-            g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(updateFloorRequest), i*2+j);
+            g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(callRequest), i*2+j);
             context = gtk_widget_get_style_context(button);
             gtk_style_context_add_class(context,"btn-floor");
             gtk_table_attach_defaults(GTK_TABLE(table), button, j, j+1, i, i+1);
             pos++;
         }
     }
-    textView = gtk_label_new("1");
+    labelNumberFloor = gtk_label_new("1");
     addArrival();
-    gtk_widget_set_size_request(textView, 50, 30);
-    context = gtk_widget_get_style_context(textView);
+    gtk_widget_set_size_request(labelNumberFloor, 50, 30);
+    context = gtk_widget_get_style_context(labelNumberFloor);
     gtk_style_context_add_class(context,"bg-black");
     gtk_style_context_add_class(context,"border-black-1");
     gtk_style_context_add_class(context,"text-white");
 
-    //arrow = gtk_image_new_from_file("up1.gif");
     arrow = gtk_image_new();
-    //gtk_widget_hide(arrow);
     gtk_widget_set_size_request(arrow, 30, 30);
 
      hbox = gtk_hbox_new(TRUE, 3);
      gtk_container_add(GTK_CONTAINER(hbox), arrow);
-     gtk_container_add(GTK_CONTAINER(hbox), textView);
-
-    buttonCall = gtk_button_new_with_label("Call");
-    gtk_widget_set_size_request(buttonCall, 50, 30);
-
-    //gtk_table_attach(GTK_TABLE(tableParent), textView, 0,1,0,1,GTK_FILL, GTK_FILL, 100, 10);
+     gtk_container_add(GTK_CONTAINER(hbox), labelNumberFloor);
 
     gtk_table_attach(GTK_TABLE(tableParent), hbox, 0,1,0,1,GTK_FILL, GTK_FILL, 100, 5);
     gtk_table_attach_defaults(GTK_TABLE(tableParent), table, 0,1,1,2);
-    gtk_table_attach(GTK_TABLE(tableParent), buttonCall, 0,1,2,3, GTK_FILL, GTK_FILL, 100, 5);
-
 
     gtk_container_add(GTK_CONTAINER(window), tableParent);
     g_signal_connect(G_OBJECT(window), "destroy",
     G_CALLBACK(gtk_main_quit), NULL);
-
-    g_signal_connect(buttonCall, "clicked", G_CALLBACK(callRequest), NULL);
 
 }
 
