@@ -18,20 +18,22 @@ void main(int argc, char const *argv[])
     if((pid=fork()) !=0) {
 		execl("./liftMng","./liftMng",NULL);
 	}
-	if((pid=fork())==0) {
-		execl("./liftSensor","./liftSensor",NULL);
-		return;
-	}
-	
+	usleep(2000);
 	if((pid=fork())==0) {
 		execl("./liftCtr","./liftCtr",NULL);
 		return;
 	}
+	usleep(2000);
 	if((pid=fork())==0) {
 		execl("./liftBody","./liftBody",NULL);
 		return;
 	}
-	
+	usleep(2000);
+	if((pid=fork())==0) {
+		execl("./liftSensor","./liftSensor",NULL);
+		return;
+	}
+	usleep(2000);
 	if((pid=fork())==0){
 		execl("./1nd_floor","./1nd_floor",NULL);
 	}
